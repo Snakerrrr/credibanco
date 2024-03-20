@@ -1,0 +1,89 @@
+kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftWebConsole
+  name: api-bin-tarjeta
+  namespace: api-consulta-dcc-prod
+  labels:
+    app: api-bin-tarjeta
+spec:
+  strategy:
+    type: Rolling
+    rollingParams:
+      updatePeriodSeconds: 1
+      intervalSeconds: 1
+      timeoutSeconds: 600
+      maxUnavailable: 25%
+      maxSurge: 25%
+    resources: {}
+    activeDeadlineSeconds: 21600
+  triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - api-bin-tarjeta
+        from:
+          kind: ImageStreamTag
+          namespace: api-consulta-dcc-prod
+          name: 'api-bin-tarjeta:latest'
+        lastTriggeredImage: >-
+          image-registry.openshift-image-registry.svc:5000/api-consulta-dcc-prod/api-bin-tarjeta@sha256:234ec9c7c58364b278ee816f5240019d55c4c2a749613a08e43b8016ff83763f
+    - type: ConfigChange
+  replicas: 1
+  revisionHistoryLimit: 10
+  test: false
+  selector:
+    deploymentconfig: api-bin-tarjeta
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: api-bin-tarjeta
+        deploymentconfig: api-bin-tarjeta
+    spec:
+      volumes:
+        - name: volume-il16a
+          secret:
+            secretName: api-bin-tarjeta-secret
+            defaultMode: 420
+        - name: volume-s6907
+          configMap:
+            name: api-bin-tarjeta-properties
+            defaultMode: 420
+      containers:
+        - resources:
+            limits:
+              cpu: 250m
+              memory: 384Mi
+            requests:
+              cpu: 1m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          name: api-bin-tarjeta
+          env:
+            - name: TZ
+              value: America/Bogota
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8443
+              protocol: TCP
+            - containerPort: 8778
+              protocol: TCP
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: volume-il16a
+              readOnly: true
+              mountPath: /etc/secrets/springboot-config
+            - name: volume-s6907
+              mountPath: /ConfigMap
+          terminationMessagePolicy: File
+          image: >-
+            image-registry.openshift-image-registry.svc:5000/api-consulta-dcc-prod/api-bin-tarjeta@sha256:234ec9c7c58364b278ee816f5240019d55c4c2a749613a08e43b8016ff83763f
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
