@@ -4,7 +4,7 @@ metadata:
   annotations:
     openshift.io/generated-by: OpenShiftWebConsole
   name: api-bin-tarjeta
-  namespace: api-consulta-dcc-prod
+  namespace: test-app
   labels:
     app: api-bin-tarjeta
 spec:
@@ -26,7 +26,7 @@ spec:
           - api-bin-tarjeta
         from:
           kind: ImageStreamTag
-          namespace: api-consulta-dcc-prod
+          namespace: test-app
           name: 'api-bin-tarjeta:latest'
         lastTriggeredImage: >-
           image-registry.openshift-image-registry.svc:5000/api-consulta-dcc-prod/api-bin-tarjeta@sha256:234ec9c7c58364b278ee816f5240019d55c4c2a749613a08e43b8016ff83763f
